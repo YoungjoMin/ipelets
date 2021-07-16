@@ -4,6 +4,7 @@
 # include <vector>
 # include <random>
 # include <queue>
+# include <numeric>
 
 using namespace ipe;
 
@@ -238,18 +239,22 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     delete ot;
 }
 
-void PointLocation::gatherAllLeafs(std::vector<Node *>& buffer) const {
-    if(root->isLeaf()) {
-        buffer.push_back(root);
-        return;
-    }
+void Node::pushValidEdges(std::vector<std::pair<int, int>>& edges, int limit) const {
+    if(p1<p2 && p1<limit && p2<limit) edges.push_back({p1,p2});
+    if(p2<p3 && p2<limit && p3<limit) edges.push_back({p2,p3});
+    if(p3<p1 && p3<limit && p1<limit) edges.push_back({p3,p1});
+}
+
+void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const {
+    if(root->isLeaf()) return;
+
     std::queue<Node *> q;
     q.push(root);
     while(!q.empty()) {
         Node* cur = q.front();
         q.pop();
         if(cur->isLeaf()) {
-            buffer.push_back(cur);
+            cur->pushValidEdges(edges,limit);
             continue;
         }
         for(Node * chd : {cur->c1, cur->c2, cur->c3}) {
@@ -357,4 +362,42 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
 
     delete t;
     delete ot;
+}
+
+void getBoundingBox(const std::vector<Vector>& pts, Vector& bl, Vector& tr) {
+    if(pts.size()==0) {bl=Vector(-1,-1),tr=Vector(1,1); return;}
+    double b,l,t,r;
+    b=t=pts[0].y, l=r=pts[0].x;
+    for(const Vector& v : pts) {
+        b = std::min(b, v.y);
+        l = std::min(l, v.x);
+
+        t = std::max(t, v.y);
+        r = std::max(r, v.x);
+    }
+    bl = Vector(l, b);
+    tr = Vector(r, t);
+    return;
+}
+
+bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, int>>& edges)
+{
+    pts.clear();
+    pts.insert(pts.begin(), npts.begin(),npts.end());
+    Vector bl, tr;
+    getBoundingBox(npts, bl, tr);
+    PointLocation pointlocation (bl,tr);
+
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::vector<int> order(npts.size());
+    std::iota(order.begin(),order.end(),0);
+
+    std::shuffle(order.begin(), order.end(), g);
+    for(int cur : order) {
+        pointlocation.insert(cur);
+    }
+    pointlocation.gatherAllEdges(edges, npts.size());
+    return true;
 }

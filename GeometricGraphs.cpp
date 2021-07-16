@@ -1,7 +1,10 @@
 # include "include/ipelib.h"
 # include "Delaunay.hpp"
+# include "DelaunayDS.hpp"
 
 using namespace ipe;
+
+bool RunDelaunay(IpeletData * data, IpeletHelper * helper);
 
 class GeometricGraphsIpelet : public Ipelet {
 public:

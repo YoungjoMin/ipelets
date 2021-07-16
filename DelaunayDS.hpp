@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __DELAUNAY_DS_HPP__
+#define __DELAUNAY_DS_HPP__
 
 #include "include/ipelib.h"
 
@@ -42,13 +43,14 @@ struct Node {
     int getOppositeEdge(int idx) const;
     int getAdjNodeOppositeVertex(int edge) const;
     Node * getAdjNode(int edge) const;
+    void pushValidEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
 };
 
 struct PointLocation {
     Node * root;
     PointLocation(const Vector& bl, const Vector& tr); //Point location structure that all points are bounded by bl, tr
     void insert(int idx);//insert idx's point
-    void gatherAllLeafs(std::vector<Node *>& buffer) const;
+    void gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
 
 private:
     void legalize(Node * node, int idx);
@@ -56,3 +58,6 @@ private:
     void insertPointInterior(Node* node, int idx);
     void insertPointEdge(Node* node, int idx, int edge);
 };
+
+
+#endif
