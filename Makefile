@@ -1,7 +1,7 @@
 CC = g++
-CFLAGS = -shared -Wall -O3
-LDFLAGS = -lstdc++ -L./bin -lipe
-OBJS = GeometricGraphs.o Delaunay.o
+OBJFLAGS = -std=c++17 -Wall -O3 -c
+DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L./bin -lipe
+OBJS = Delaunay.o GeometricGraphs.o
 TARGET = GeometricGraphs.dll
 
 ALL: $(TARGET)
@@ -9,6 +9,12 @@ ALL: $(TARGET)
 clean:
 	rm -rf $(OBJS) $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+Delaunay.o: Delaunay.cpp Delaunay.hpp DelaunayDS.hpp
+	$(CC) $(OBJFLAGS) -o $@ Delaunay.cpp
+
+GeometricGraphs.o: GeometricGraphs.cpp Delaunay.o
+	$(CC) $(OBJFLAGS) -o $@ GeometricGraphs.cpp
+
+GeometricGraphs.dll: Delaunay.o GeometricGraphs.o
+	$(CC) $(DLLFLAGS) -o $@ Delaunay.o GeometricGraphs.o
 
