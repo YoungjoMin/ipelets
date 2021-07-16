@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -shared -Wall -O3
 LDFLAGS = -lstdc++ -L./bin -lipe
-OBJS = GeometricGraphs.o
+OBJS = GeometricGraphs.o Delaunay.o
 TARGET = GeometricGraphs.dll
 
 ALL: $(TARGET)
