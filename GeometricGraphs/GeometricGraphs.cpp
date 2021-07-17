@@ -1,6 +1,7 @@
 # include "../../include/ipelib.h"
 # include "Delaunay.hpp"
 # include "DelaunayDS.hpp"
+#include <string>
 
 using namespace ipe;
 
@@ -19,14 +20,14 @@ IPELET_DECLARE Ipelet *newIpelet()
 
 bool GeometricGraphsIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
     switch(num) {
-        case 1: return RunDelaunay(data,helper);
+        case 0:  return RunDelaunay(data,helper);
         default: break;
     }
     return false;
 }
 
 bool printDebugInfoAndReturn(IpeletHelper* helper, const char * str) {
-    helper->message(str);
+    helper->messageBox(str, NULL, IpeletHelper::EOkButton);
     return false;
 }
 

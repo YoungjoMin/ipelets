@@ -2,23 +2,25 @@
 # include "Delaunay.hpp"
 # include "DelaunayDS.hpp"
 # include <vector>
+# include <ctime>
 # include <random>
 # include <queue>
 # include <numeric>
+
+
 
 using namespace ipe;
 
 //all points want to add at Delaunay triangulation
 //contained here
 static std::vector<Vector> pts;
-Triangle NOTUSED;
-Triangle * NIL = &NOTUSED;
+static std::mt19937 gen((unsigned int)time(NULL));
 
 bool inCircle(const Vector& a, const Vector& b, const Vector& c, const Vector& d) {
     double t[3][3] = {
-        {b.x-a.x, b.y-a.y, b.sqLen()-a.sqLen()},
-        {c.x-a.x, c.y-a.y, c.sqLen()-a.sqLen()},
-        {d.x-a.x, d.y-a.y, d.sqLen()-a.sqLen()},
+        {a.x-d.x, a.y-d.y, a.sqLen()-d.sqLen()},
+        {b.x-d.x, b.y-d.y, b.sqLen()-d.sqLen()},
+        {c.x-d.x, c.y-d.y, c.sqLen()-d.sqLen()},
     };
     double det = 0.0;
     det += t[0][0]*(t[1][1]*t[2][2]-t[1][2]*t[2][1]);
@@ -74,8 +76,8 @@ void loadPts(const std::vector<Vector>& o) {
 
 void Triangle::updateAdj(Triangle * prv, Triangle* cur) {
     if(adj[0]==prv) adj[0]=cur;
-    else if(adj[1]==prv) adj[1]=cur;
-    else if(adj[2]==prv) adj[2]=cur;
+    if(adj[1]==prv) adj[1]=cur;
+    if(adj[2]==prv) adj[2]=cur;
     return;
 }
 
@@ -101,10 +103,16 @@ PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
     pts.push_back( Vector(c - (b-d), d));
     pts.push_back( Vector(a + (b-d), d));
 
+    NILNODE = new Node(-1,-1,-1);
+    NILT = new Triangle();
+    NILT->node = NILNODE, NILNODE->t = NILT;
+    NILT->adj[0]=NILT->adj[1]=NILT->adj[2]= NILT;
+
+
     Triangle* t = new Triangle();
     Node * node = new Node(n, n+1, n+2);
     t->node = node;
-    t->adj[0]=t->adj[1]=t->adj[2] = NIL;
+    t->adj[0]=t->adj[1]=t->adj[2] = NILT;
     node->t = t;
     root = node;
 }
@@ -116,10 +124,9 @@ Node * Node::findChild(int idx) const{
         b1 = ccw(pt,p1,idx);
         b2 = ccw(pt,p2,idx);
         b3 = ccw(pt,p3,idx);
-        if(b1&&b2) return c1;
-        else if(b2&&b3) return c2;
+        if(b1&&!b2) return c1;
+        else if(b2&&!b3) return c2;
         return c3;
-        //else if(b3&&b1) return c3;
     }
     else {
         int p = 0;
@@ -166,7 +173,7 @@ int Node::getAdjNodeOppositeVertex(int edge) const {
     Node * adj = this->getAdjNode(edge);
     int e1 = tmp[edge];
     if(e1==adj->p1) return adj->p2;
-    if(e1==adj->p2) return adj->p3;
+    if(e1==adj->p2) return adj->p3;    
     if(e1==adj->p3) return adj->p1;
     return -1;
 }
@@ -175,7 +182,7 @@ void PointLocation::insert(int idx) {
     Node * cur = root;
     while(!cur->isLeaf()) {
         cur = cur->findChild(idx);
-    }
+    }  
     int en = cur->edgeNum(idx);
     if(en!=0)  insertPointEdge(cur,idx,en);
     else  insertPointInterior(cur,idx);
@@ -185,21 +192,21 @@ void PointLocation::insert(int idx) {
 
 void PointLocation::legalize(Node * node, int idx) {
     int edge = node->getOppositeEdge(idx);
-    int test = node->getAdjNodeOppositeVertex(edge);
+    int test = node->getAdjNodeOppositeVertex(edge);    
     if(test == -1) return; //if adj Node is NIL
     if(!inCircle(node->p1,node->p2,node->p3, test)) return;
-    Node * onode = node->getAdjNode(edge);
-    flip(node, onode, idx, test);
-    legalize(node->c1, idx);
-    legalize(node->c2, idx);
+    Node * onode = node->getAdjNode(edge);    
+    flip(node, onode, idx, test);    
+    legalize(node->c1, idx);    
+    legalize(node->c2, idx);    
 }
 
-void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
+void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {    
     Triangle * t = node->t, *ot = onode->t;
 
     int anum = node->vertexNum(aidx), bnum = onode->vertexNum(bidx);
     int tmp[] = {node->p3, node->p1, node->p2, node->p3, node->p1};
-    int cidx = tmp[anum-1], didx = tmp[anum+1];
+    int cidx = tmp[anum-1], didx = tmp[anum+1];    
 
     Triangle * t1 = t->adj[anum==1 ? 2 : anum-2];
     Triangle * t2 = t->adj[anum-1];
@@ -209,23 +216,23 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     Triangle * ut = new Triangle();
     Triangle * dt = new Triangle();
     Node * unode = new Node(aidx, bidx, cidx);
-    Node * dnode = new Node(didx, bidx, aidx);
+    Node * dnode = new Node(didx, bidx, aidx);    
 
     ut->node = unode;
     ut->adj[0]=dt, ut->adj[1]=t4, ut->adj[2]=t1;
 
     dt->node = dnode;
     dt->adj[0]=t3, dt->adj[1]=ut, dt->adj[2]=t2;
-
+    
     t1->updateAdj(t, ut);
     t2->updateAdj(t, dt);
     t3->updateAdj(ot, dt);
-    t4->updateAdj(ot, ut);
+    t4->updateAdj(ot, ut);    
 
     unode->t = ut;
     dnode->t = dt;
     
-    //////////////
+    //////////////    
     int n = pts.size();
     node->pt = onode->pt = n;
     pts.push_back(intersection(aidx,bidx,cidx,didx));
@@ -233,7 +240,7 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     onode->divideBy = (Node::Divide)(onode->getOppositeEdge(bidx));
     node->t = onode->t = NULL;
     node->c1= dnode, node->c2 = unode;
-    onode->c1 = unode, onode->c2 = dnode;
+    onode->c1 = unode, onode->c2 = dnode;    
 
     delete t;
     delete ot;
@@ -269,7 +276,7 @@ void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int 
 
 void PointLocation::insertPointInterior(Node * node, int idx) {
     Triangle * t = node->t;
-    Triangle * t1,*t2,*t3;
+    Triangle * t1,*t2,*t3;    
 
     t1=t->adj[0], t2=t->adj[1],t3=t->adj[2];
 
@@ -291,7 +298,7 @@ void PointLocation::insertPointInterior(Node * node, int idx) {
 
     t1->updateAdj(t, nt1);
     t2->updateAdj(t, nt2);
-    t3->updateAdj(t, nt3);
+    t3->updateAdj(t, nt3);    
 
     node1->t = nt1;
     node2->t = nt2;
@@ -302,17 +309,21 @@ void PointLocation::insertPointInterior(Node * node, int idx) {
     node->t = NULL;
     node->c1 = node1;
     node->c2 = node2;
-    node->c3 = node3;
+    node->c3 = node3;    
+
+    legalize(node1, idx);
+    legalize(node2, idx);
+    legalize(node3, idx);    
 
     delete t;
 }
-void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
+void PointLocation::insertPointEdge(Node* node, int idx, int edge) {    
     Node * onode = node->getAdjNode(edge);
 
     int tmp[] = {node->p3, node->p1, node->p2, node->p3, node->p1};
     int aidx = tmp[edge-1], bidx = tmp[edge+1], cidx = tmp[edge];
     int didx = node->getAdjNodeOppositeVertex(edge);
-    int bnum = node->vertexNum(bidx), dnum = onode->vertexNum(didx);
+    int bnum = node->vertexNum(bidx), dnum = onode->vertexNum(didx);    
     
     Triangle * t = node->t, *ot = onode->t;
     
@@ -329,7 +340,7 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
     Node * node1 = new Node(idx, aidx, bidx);
     Node * node2 = new Node(idx, bidx, cidx);
     Node * node3 = new Node(idx, cidx, didx);
-    Node * node4 = new Node(idx, didx, aidx);
+    Node * node4 = new Node(idx, didx, aidx);    
 
     nt1->node = node1;
     nt1->adj[0] = nt4, nt1->adj[1] = t1, nt1->adj[2] = nt2;
@@ -358,11 +369,21 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
     onode->divideBy = (Node::Divide)(onode->getOppositeEdge(didx));
     node->t = onode->t = NULL;
     node->c1 = node2, node->c2 = node1;
-    onode->c1 = node4, onode->c2 = node3;
+    onode->c1 = node4, onode->c2 = node3;    
+
+    ///////////////
+    legalize(node1, idx);
+    legalize(node2, idx);
+    legalize(node3, idx);
+    legalize(node4, idx);
+    
 
     delete t;
     delete ot;
 }
+
+///////////////////////////////////////////////////////
+
 
 void getBoundingBox(const std::vector<Vector>& pts, Vector& bl, Vector& tr) {
     if(pts.size()==0) {bl=Vector(-1,-1),tr=Vector(1,1); return;}
@@ -388,13 +409,10 @@ bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, i
     getBoundingBox(npts, bl, tr);
     PointLocation pointlocation (bl,tr);
 
-
-    std::random_device rd;
-    std::mt19937 g(rd());
     std::vector<int> order(npts.size());
     std::iota(order.begin(),order.end(),0);
+    std::shuffle(order.begin(), order.end(), gen);
 
-    std::shuffle(order.begin(), order.end(), g);
     for(int cur : order) {
         pointlocation.insert(cur);
     }

@@ -53,6 +53,8 @@ struct PointLocation {
     void gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
 
 private:
+    Node * NILNODE;
+    Triangle * NILT;
     void legalize(Node * node, int idx);
     void flip(Node * node, Node * onode, int a, int b);
     void insertPointInterior(Node* node, int idx);
