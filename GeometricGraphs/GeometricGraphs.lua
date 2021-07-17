@@ -11,5 +11,5 @@ function run(model, num)
 end
 
 methods = {
-    --currently no methos available
+    { label="Delaunay Triangulation" },
 }
