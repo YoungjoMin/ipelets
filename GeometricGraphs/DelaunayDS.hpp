@@ -1,7 +1,7 @@
 #ifndef __DELAUNAY_DS_HPP__
 #define __DELAUNAY_DS_HPP__
 
-#include "include/ipelib.h"
+#include "../../include/ipelib.h"
 
 using namespace ipe;
 

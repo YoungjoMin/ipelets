@@ -1,6 +1,6 @@
 #ifndef __DELAUNAY_HPP__
 #define __DELAUNAY_HPP__
-#include "include/ipelib.h"
+#include "../../include/ipelib.h"
 #include <utility>
 #include <vector>
 

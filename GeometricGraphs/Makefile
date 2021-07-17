@@ -1,6 +1,6 @@
 CC = g++
 OBJFLAGS = -std=c++17 -Wall -O3 -c
-DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L./bin -lipe
+DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L../../bin -lipe
 OBJS = Delaunay.o GeometricGraphs.o
 TARGET = GeometricGraphs.dll
 
