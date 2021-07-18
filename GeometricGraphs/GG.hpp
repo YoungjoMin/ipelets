@@ -1,10 +1,10 @@
-#ifndef __RNG_HPP__
-#define __RNG_HPP__
+#ifndef __GG_HPP__
+#define __GG_HPP__
 #include "../../include/ipelib.h"
 #include <utility>
 #include <vector>
 
-bool RNG(const std::vector<ipe::Vector>& pts,
+bool GG(const std::vector<ipe::Vector>& pts,
     std::vector<std::pair<int, int>>& edges);
 
 #endif

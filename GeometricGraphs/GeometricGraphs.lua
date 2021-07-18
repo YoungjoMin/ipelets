@@ -12,6 +12,7 @@ end
 
 methods = {
     { label="Delaunay Triangulation" },
-    { label="RNG" },
-    { label="EMST" },
+    { label="Gabriel Graph" },
+    { label="Relative Neighborhood Graph" },
+    { label="Euclidean Minimum Spanning Tree" },
 }

@@ -1,5 +1,6 @@
 # include "../../include/ipelib.h"
 # include "Delaunay.hpp"
+# include "GG.hpp"
 # include "RNG.hpp"
 # include "EMST.hpp"
 # include <string>
@@ -8,6 +9,7 @@ using namespace ipe;
 
 bool RunDelaunay(IpeletData * data, IpeletHelper * helper);
 bool RunRNG(IpeletData * data, IpeletHelper * helper);
+bool RunGG(IpeletData * data, IpeletHelper * helper);
 bool RunEMST(IpeletData * data, IpeletHelper * helper);
 
 class GeometricGraphsIpelet : public Ipelet {
@@ -24,8 +26,9 @@ IPELET_DECLARE Ipelet *newIpelet()
 bool GeometricGraphsIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
     switch(num) {
         case 0:  return RunDelaunay(data,helper);
-        case 1:  return RunRNG(data,helper);
-        case 2:  return RunEMST(data,helper);
+        case 1:  return RunGG(data,helper);
+        case 2:  return RunRNG(data,helper);
+        case 3:  return RunEMST(data,helper);
         default: break;
     }
     return false;
@@ -66,6 +69,15 @@ bool RunDelaunay(IpeletData * data, IpeletHelper * helper) {
     std::vector<std::pair<int, int>> edges;
     if(!getSelectedPoints(data,helper, pts)) return false;
     if(!Delaunay(pts,edges)) return false;
+    if(!addGivenEdges(data, pts,edges)) return false;
+    return true;
+}
+
+bool RunGG(IpeletData * data, IpeletHelper * helper) {
+    std::vector<Vector> pts;
+    std::vector<std::pair<int, int>> edges;
+    if(!getSelectedPoints(data,helper, pts)) return false;
+    if(!GG(pts,edges)) return false;
     if(!addGivenEdges(data, pts,edges)) return false;
     return true;
 }
