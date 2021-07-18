@@ -1,4 +1,5 @@
 CC = g++
+TESTFLAGS = -std=c++17 -Wall
 OBJFLAGS = -std=c++17 -Wall -O3 -c
 DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L../../bin -lipe
 OBJS = Delaunay.o GeometricGraphs.o
@@ -19,6 +20,10 @@ GeometricGraphs.o: GeometricGraphs.cpp
 
 GeometricGraphs.dll: Delaunay.o GeometricGraphs.o
 	$(CC) $(DLLFLAGS) -o $@ Delaunay.o GeometricGraphs.o
+
+test: Test.cpp Delaunay.o
+	$(CC) $(TESTFLAGS) -o Test.exe Delaunay.o Test.cpp
+
 
 install: ALL $(DLL) $(LUA)
 	cp $(DLL) ../
