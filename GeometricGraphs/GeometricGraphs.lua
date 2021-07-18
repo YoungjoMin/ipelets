@@ -12,4 +12,5 @@ end
 
 methods = {
     { label="Delaunay Triangulation" },
+    { label="EMST" },
 }
