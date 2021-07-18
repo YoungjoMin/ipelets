@@ -31,19 +31,13 @@ bool GeometricGraphsIpelet::run(int num, IpeletData * data, IpeletHelper * helpe
     return false;
 }
 
-bool printDebugInfoAndReturn(IpeletHelper* helper, const char * str) {
-    helper->messageBox(str, NULL, IpeletHelper::EOkButton);
-    return false;
-}
-
 bool getSelectedPoints(IpeletData* data, IpeletHelper* helper, std::vector<Vector>& pts) {
     Page* page = data->iPage;
     int n = page->count();
     for(int i= 0;i<n;i++) {
         if(page->select(i) == TSelect::ENotSelected) continue;
         Object * obj = page->object(i);
-        if(obj->type() != Object::EReference) 
-            return printDebugInfoAndReturn(helper, "selected Objects have to be reference");
+        if(obj->type() != Object::EReference) continue;
         Reference * ref = obj->asReference();
         Vector cur = obj->matrix() * ref->position();
         pts.push_back(cur);
