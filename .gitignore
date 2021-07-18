@@ -1,0 +1,9 @@
+/.vscode/*
+/temp/*
+*.txt
+*.dll
+*.o
+*.exe
+
+*.lua
+!/*/*.lua
