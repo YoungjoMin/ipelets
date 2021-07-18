@@ -16,79 +16,6 @@ using namespace ipe;
 static std::vector<Vector> pts;
 static std::mt19937 gen((unsigned int)time(NULL));
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-//DEBUG
-#ifdef LOGGING
-
-#include <fstream>
-
-class Logger {
-private:
-    Logger() {
-        clear();
-        (*this)<<"Logger Created!\n\n";
-    }
-    const static char * filename;
-public:
-    static Logger& get() {
-        static Logger* instance = new Logger();    
-        return (*instance);
-    }
-    void clear() {
-        std::ofstream os(filename);
-        os.close();
-    }
-    template <class T>
-    Logger& operator<<(const T& obj) {
-        std::ofstream  os(filename, std::ofstream::app);
-        os<<obj;
-        os.close();
-        return (*this);        
-    }
-
-    Logger& operator<<(const Vector& vec) {
-        std::ofstream  os(filename, std::ofstream::app);
-        os<<'('<<vec.x<<", "<<vec.y<<")";
-        os.close();
-        return (*this);        
-    }
-
-    Logger& operator<<(Node* node) {
-        (*this)<<"node's address = "<<((void * )node)<<", ";
-        (*this)<<pts[node->p1]<<", "<<pts[node->p2]<<", "<<pts[node->p3];
-        return (*this);        
-    }
-
-    Logger& operator<<(Triangle* node) {
-        std::ofstream  os(filename, std::ofstream::app);
-        os<<"triangle's address = "<<((void * )node)<<", adjs = ";
-        os<<node->adj[0]<<", ";
-        os<<node->adj[1]<<", ";
-        os<<node->adj[2]<<", ";
-        os.close();
-        return (*this);
-    }
-
-
-
-    void LogHere(const char * funname, int line) {
-        static int counter=0;
-        std::ofstream  os(filename, std::ofstream::app);
-        os<<"filename = "<<funname<<", line = "<<line<<",counter = "<<counter++<<"\n\n";
-        os.close();
-    }
-
-};
-const char * Logger::filename = "log.txt";
-static Logger& LOG = Logger::get();
-#define LOGHERE() Logger::get().LogHere(__FUNCTION__, __LINE__)
-
-#endif
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 bool inCircle(const Vector& a, const Vector& b, const Vector& c, const Vector& d) {
     double t[3][3] = {
         {a.x-d.x, a.y-d.y, a.sqLen()-d.sqLen()},
@@ -160,9 +87,6 @@ bool Node::isLeaf() const {
 }
 
 PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
-#ifdef LOGGING
-    LOG<<"Point Location creation!\n";
-#endif
     Vector nbl = bl - (tr-bl)*16;
     Vector ntr = tr + (tr-bl)*16;
 
@@ -186,12 +110,6 @@ PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
     t->adj[0]=t->adj[1]=t->adj[2] = NILT;
     node->t = t;
     root = node;
-#ifdef LOGGING
-    LOG<<"NILNODE = "<<NILNODE<<"\n";
-    LOG<<"NILT = "<<NILT<<"\n";
-    LOG<<"Big triangle node= "<<node<<"\n";
-    LOG<<"with t = "<<t<<"\n\n";
-#endif
 }
 
 //assert divieBy != NotDivided
@@ -227,7 +145,7 @@ int Node::vertexNum(int idx) const {
     if(p1==idx) return 1;
     if(p2==idx) return 2;
     if(p3==idx) return 3;
-    //return 0;
+    return 0;
 }
 
 int Node::getOppositeVertex(int edge) const {
@@ -279,9 +197,6 @@ void PointLocation::legalize(Node * node, int idx) {
 }
 
 void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
-#ifdef LOGGING
-    LOG<<"flip happen between\n"<<node<<" and "<<onode<<'\n';
-#endif
     Triangle * t = node->t, *ot = onode->t;
 
     int anum = node->vertexNum(aidx), bnum = onode->vertexNum(bidx);
@@ -312,14 +227,6 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     unode->t = ut;
     dnode->t = dt;
 
-#ifdef LOGGING
-    LOG<<"new Two nodes created\n";
-    LOG<<unode<<"\n";
-    LOG<<dnode<<"\n";
-    LOG<<"with Two triangles\n";
-    LOG<<ut<<"\n";
-    LOG<<dt<<"\n\n";
-#endif
     //////////////    
     int n = pts.size();
     node->pt = onode->pt = n;
@@ -363,9 +270,6 @@ void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int 
 }
 
 void PointLocation::insertPointInterior(Node * node, int idx) {
-#ifdef LOGGING
-    LOG<<"Insert Point Interior At "<<node<<" point = "<<pts[idx]<<"\n";
-#endif
     Triangle * t = node->t;
     Triangle * t1,*t2,*t3;    
 
@@ -394,18 +298,6 @@ void PointLocation::insertPointInterior(Node * node, int idx) {
     node1->t = nt1;
     node2->t = nt2;
     node3->t = nt3;
-
-#ifdef LOGGING
-    LOG<<"new Three nodes created\n";
-    LOG<<node1<<"\n";
-    LOG<<node2<<"\n";
-    LOG<<node3<<"\n";
-    LOG<<"with Three t\n";
-    LOG<<t1<<"\n";
-    LOG<<t2<<"\n";
-    LOG<<t3<<"\n\n";
-#endif
-
     /////
     node->divideBy = Node::BySinglePt;
     node->pt = idx;
@@ -422,9 +314,6 @@ void PointLocation::insertPointInterior(Node * node, int idx) {
 }
 void PointLocation::insertPointEdge(Node* node, int idx, int edge) {   
     Node * onode = node->getAdjNode(edge);
-#ifdef LOGGING
-    LOG<<"Insert Point Edge Between "<<node<<" and "<<onode<<" point = "<<pts[idx]<<"\n"; 
-#endif
 
     int tmp[] = {node->p3, node->p1, node->p2, node->p3, node->p1};
     int aidx = tmp[edge+1], bidx = tmp[edge-1], cidx = tmp[edge];
@@ -469,20 +358,6 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
     node2->t = nt2;
     node3->t = nt3;
     node4->t = nt4;
-
-#ifdef LOGGING
-    LOG<<"new Four nodes created\n";
-    LOG<<node1<<"\n";
-    LOG<<node2<<"\n";
-    LOG<<node3<<"\n";
-    LOG<<node4<<"\n";
-    LOG<<"with Four t\n";
-    LOG<<t1<<"\n";
-    LOG<<t2<<"\n";
-    LOG<<t3<<"\n";
-    LOG<<t4<<"\n\n";
-#endif
-
     //////////////
     node->pt = onode->pt = idx;
     node->divideBy = (Node::Divide)(node->getOppositeEdge(bidx));
