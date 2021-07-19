@@ -79,7 +79,7 @@ void Triangle::updateAdj(Triangle * prv, Triangle* cur) {
 Node::Node(int p1, int p2, int p3): p1(p1), p2(p2), p3(p3) {
     c1=c2=c3= NULL; t=NULL;
     divideBy = NotDivided;
-    visited = false;
+    visitCnt = 0;
 }
 
 bool Node::isLeaf() const {
@@ -91,12 +91,14 @@ PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
     Vector ntr = tr + (tr-bl)*16;
 
     double &a = ntr.x,&b=ntr.y, &c=nbl.x,&d=nbl.y;
-    
+
     //Giant triangle
     int n = pts.size();
     pts.push_back( Vector((a+c)/2, b + (a-c)/2));
     pts.push_back( Vector(c - (b-d), d));
     pts.push_back( Vector(a + (b-d), d));
+
+    gatherCnt = 0;
 
     NILNODE = new Node(-1,-1,-1);
     NILT = new Triangle();
@@ -247,7 +249,8 @@ void Node::pushValidEdges(std::vector<std::pair<int, int>>& edges, int limit) co
     if(p3<p1 && p3<limit && p1<limit) edges.push_back({p3,p1});
 }
 
-void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const {
+void PointLocation::gatherAllNodes(std::vector<Node *>& nodes) const {
+    gatherCnt++;
     if(root->isLeaf()) return;
 
     std::queue<Node *> q;
@@ -255,18 +258,37 @@ void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int 
     while(!q.empty()) {
         Node* cur = q.front();
         q.pop();
-        if(cur->isLeaf()) {
-            cur->pushValidEdges(edges,limit);
-            continue;
-        }
         for(Node * chd : {cur->c1, cur->c2, cur->c3}) {
             if(chd == NULL) continue;
-            if(chd->visited) continue;
-            chd->visited=true;
+            if(chd->visitCnt == gatherCnt) continue;
+            chd->visitCnt=gatherCnt;
             q.push(chd);
+            nodes.push_back(chd);
         }
     }
     return;
+}
+void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const {
+    std::vector<Node *> nodes;
+    gatherAllNodes(nodes);
+    for(const Node * node : nodes) {
+        if(!node->isLeaf()) continue;
+        node->pushValidEdges(edges,limit);
+    }
+    return;
+}
+
+PointLocation::~PointLocation() 
+{
+    std::vector<Node *> nodes;
+    gatherAllNodes(nodes);
+    for(const Node * node : nodes) {
+        if(node->isLeaf())
+            delete node->t;
+        delete node;
+    }
+    delete NILNODE;
+    delete NILT;
 }
 
 void PointLocation::insertPointInterior(Node * node, int idx) {
@@ -398,7 +420,6 @@ void getBoundingBox(const std::vector<Vector>& pts, Vector& bl, Vector& tr) {
 
 bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, int>>& edges)
 {
-    pts.clear();
     pts.insert(pts.begin(), npts.begin(),npts.end());
     Vector bl, tr;
     getBoundingBox(npts, bl, tr);
@@ -412,5 +433,6 @@ bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, i
         pointlocation.insert(cur);
     }
     pointlocation.gatherAllEdges(edges, npts.size());
+    pts.clear();
     return true;
 }

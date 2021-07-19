@@ -32,7 +32,7 @@ struct Node {
         BySinglePt
     } divideBy;
 
-    bool visited;//for gathering all Triangles at the last
+    int visitCnt;//for gathering all nodes
 
     Node(int p1, int p2, int p3);
     bool isLeaf() const;
@@ -51,14 +51,17 @@ struct PointLocation {
     PointLocation(const Vector& bl, const Vector& tr); //Point location structure that all points are bounded by bl, tr
     void insert(int idx);//insert idx's point
     void gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
-
+    ~PointLocation();
 private:
+    mutable int gatherCnt;
     Node * NILNODE;
     Triangle * NILT;
     void legalize(Node * node, int idx);
     void flip(Node * node, Node * onode, int a, int b);
     void insertPointInterior(Node* node, int idx);
     void insertPointEdge(Node* node, int idx, int edge);
+
+    void gatherAllNodes(std::vector<Node *>& nodes) const;
 };
 
 
