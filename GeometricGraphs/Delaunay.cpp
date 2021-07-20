@@ -229,10 +229,8 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     unode->t = ut;
     dnode->t = dt;
 
-    //////////////    
-    int n = pts.size();
-    node->pt = onode->pt = n;
-    pts.push_back(intersection(aidx,bidx,cidx,didx));
+    //////////////
+    node->pt = bidx; onode->pt = aidx;
     node->divideBy = (Node::Divide)(node->getOppositeEdge(aidx));
     onode->divideBy = (Node::Divide)(onode->getOppositeEdge(bidx));
     node->t = onode->t = NULL;
