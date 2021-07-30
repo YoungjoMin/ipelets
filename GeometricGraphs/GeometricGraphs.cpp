@@ -28,6 +28,10 @@ bool getSelectedPoints(IpeletData* data, IpeletHelper* helper, std::vector<Vecto
         Vector cur = obj->matrix() * ref->position();
         pts.push_back(cur);
     }
+    if(pts.size()<2) {
+        helper->messageBox("have to choose at least two points", NULL, IpeletHelper::EOkButton);
+        return false;
+    }
     return true;
 }
 
@@ -54,7 +58,7 @@ bool GeometricGraphsIpelet::run(int num, IpeletData * data, IpeletHelper * helpe
     std::vector<Vector> pts;
     std::vector<std::pair<int, int>> edges;
     if(!getSelectedPoints(data,helper, pts)) return false;
-    if(!fn[num](pts,edges)) return false;
-    if(!addGivenEdges(data, pts,edges)) return false;
-    return false;
+    fn[num](pts,edges);
+    addGivenEdges(data, pts,edges);
+    return true;
 }
