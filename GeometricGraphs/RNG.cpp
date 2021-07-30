@@ -3,11 +3,16 @@
 using namespace ipe;
 using namespace std;
 
+
 void makeRNG(const vector<Vector>& pts, const vector<pair<int, int>>& edges, vector<pair<int, int>>& rng) {
     for(const auto& [a,b]: edges) {
-        bool emptyLune = true;
         double limit = (pts[a]-pts[b]).sqLen();
-        for(const Vector& pt : pts) {
+
+        bool emptyLune = true;
+        for(int i = 0;i<(int)pts.size();i++) {
+            if(i==a || i==b) continue;
+            const Vector& pt = pts[i];
+
             double cur = std::max((pts[a]-pt).sqLen(),(pts[b]-pt).sqLen());
             if(cur>=limit) continue;
             emptyLune = false;

@@ -5,10 +5,15 @@ using namespace std;
 
 void makeGG(const vector<Vector>& pts, const vector<pair<int, int>>& edges, vector<pair<int, int>>& gg) {
     for(const auto& [a,b]: edges) {
-        bool emptyDisc = true;
         Vector mid = (pts[a]+pts[b])*0.5;
         double limit = (pts[a]-mid).sqLen();
-        for(const Vector& pt : pts) {
+
+        
+        bool emptyDisc = true;
+        for(int i= 0;i<(int)pts.size();i++) {
+            if(i==a || i==b) continue;
+            const Vector& pt = pts[i];
+
             double cur = (mid-pt).sqLen();
             if(cur>=limit) continue;
             emptyDisc = false;
