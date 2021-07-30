@@ -1,6 +1,5 @@
 # include "../../include/ipelib.h"
 # include "GeometricGraphs.hpp"
-# include <string>
 
 using namespace ipe;
 
