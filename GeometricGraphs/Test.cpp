@@ -1,8 +1,7 @@
-#include "../../include/ipelib.h"
-#include "Delaunay.hpp"
-#include "EMST.hpp"
-#include <algorithm>
-#include <iostream>
+# include "../../include/ipelib.h"
+# include "GeometricGraphs.hpp"
+# include <algorithm>
+# include <iostream>
 
 using namespace ipe;
 

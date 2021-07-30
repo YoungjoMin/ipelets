@@ -1,9 +1,8 @@
-#include "EMST.hpp"
-#include "Delaunay.hpp"
+# include "GeometricGraphs.hpp"
 
-#include <utility>
-#include <vector>
-#include <numeric>
+# include <utility>
+# include <vector>
+# include <numeric>
 
 using namespace std;
 using namespace ipe;

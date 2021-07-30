@@ -1,5 +1,5 @@
 # include "../../include/ipelib.h"
-# include "Delaunay.hpp"
+# include "GeometricGraphs.hpp"
 # include "DelaunayDS.hpp"
 # include <vector>
 # include <ctime>
@@ -16,6 +16,8 @@ using namespace ipe;
 static std::vector<Vector> pts;
 static std::mt19937 gen((unsigned int)time(NULL));
 
+
+//neccesary utils
 bool inCircle(const Vector& a, const Vector& b, const Vector& c, const Vector& d) {
     double t[3][3] = {
         {a.x-d.x, a.y-d.y, a.sqLen()-d.sqLen()},
@@ -66,8 +68,8 @@ Vector intersection(int a, int b, int c, int d) {
     return intersection(pts[a],pts[b],pts[c],pts[d]);
 }
 
-
-//============================== implement DS
+/////////////////////////////////////////////////
+//impl
 
 void Triangle::updateAdj(Triangle * prv, Triangle* cur) {
     if(adj[0]==prv) adj[0]=cur;
@@ -397,9 +399,8 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
     delete ot;
 }
 
-///////////////////////////////////////////////////////
-
-
+////////////////////////////
+//Delaunay
 void getBoundingBox(const std::vector<Vector>& pts, Vector& bl, Vector& tr) {
     if(pts.size()==0) {bl=Vector(-1,-1),tr=Vector(1,1); return;}
     double b,l,t,r;
