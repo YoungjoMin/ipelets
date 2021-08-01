@@ -65,8 +65,15 @@ bool getSelectedPolygons(IpeletData* data, IpeletHelper* helper, vector<Vector>&
         if(!isSubpathClosedPolygon(subpath, helper)) continue;
         insertClosedPolygon(subpath, obj->matrix(), pts, polys);
     }
+
     if(polys.size()==0) {
-        helper->messageBox("must choose polygons", NULL, IpeletHelper::EOkButton);
+        helper->messageBox("must choose one polygon", NULL, IpeletHelper::EOkButton);
+        return false;
+    }
+
+    //TEMP
+    if(polys.size()>1) {
+        helper->messageBox("must choose one polygon", NULL, IpeletHelper::EOkButton);
         return false;
     }
     return true;
@@ -208,16 +215,19 @@ bool precompute(vector<Vector>& pts, vector<Polygon>& polygons, IpeletHelper * h
 }
 
 bool PolygonTriangulationIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
-    //const static std::vector<Triangulation> fn = {MinAreaMaximize, MaxAreaMinimize};
-    //if(num<0 || num>=(int)fn.size()) return false;
+    const static std::vector<Triangulation> fn = {
+        MinAreaMaximize, MaxAreaMinimize,
+        SumLengthMaximize, SumLengthMinimize,
+        MinAngleMaximize, MaxAngleMinimize
+    };
+    if(num<0 || num>=(int)fn.size()) return false;
 
     std::vector<Vector> pts;
     std::vector<Polygon> polygons;
     std::vector<std::pair<int, int>> edges;
     if(!getSelectedPolygons(data,helper, pts, polygons)) return false;
     if(!precompute(pts, polygons,helper)) return false;
-    return true;
-    //fn[num](pts,polygons, edges);
+    fn[num](pts,polygons, edges);
     addGivenEdges(data, pts, edges);
     return true;
 }

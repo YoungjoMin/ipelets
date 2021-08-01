@@ -2,7 +2,7 @@ CC = g++
 TESTFLAGS = -std=c++17 -Wall -g
 OBJFLAGS = -std=c++17 -Wall -O3 -c
 DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L../../bin -lipe
-OBJS = PolygonTriangulation.o Utils.o
+OBJS = PolygonTriangulation.o Utils.o OptimalTriangulation.o
 TARGET = PolygonTriangulation.dll
 DLL = $(TARGET)
 LUA = $(TARGET:$.dll=$.lua)

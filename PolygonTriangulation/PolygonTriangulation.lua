@@ -11,6 +11,10 @@ function run(model, num)
 end
 
 methods = {
-    { label="max area minimize" },
     { label="min area maximize" },
+    { label="max area minimize" },    
+    { label="sum length maximize" },
+    { label="sum length minimize" },
+    { label="min angle maximize" },
+    { label="max angle minimize" },    
 }

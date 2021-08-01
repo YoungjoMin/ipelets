@@ -60,3 +60,31 @@ bool intersects2(const Vector& l11, const Vector& l12, const Vector& l21, const 
         return ((0 <= n1 && n1 <= d) && (0 <= n2 && n2 <= d));
 	}
 }
+
+bool originInTriangle(const Vector& t1, const Vector& t2, const Vector& t3) {
+    Vector p1,p2=t3;
+    int w =0;
+
+    for(const Vector& c : {t1,t2,t3}) {
+        p1 = p2;
+        p2 = c;
+
+        if(p1.y*p2.y<0) {
+            double tmp = cross(p2,p1);
+            if(p1.y<0) w += tmp<0 ?  2 : 0;
+            else       w += tmp>0 ? -2 : 0;
+        }
+        else if(p1.y==0 && p1.x>0) {
+            w += p2.y>0 ? 1 : -1;
+        }
+        else if(p2.y==0 && p2.x>0) {
+            w += p1.y<0 ? 1 : -1;
+        }
+
+    }
+    return w!=0;
+}
+
+bool pointInTriangle(const Vector& p, const Vector& t1, const Vector& t2, const Vector& t3) {
+    return originInTriangle(t1-p,t2-p,t3-p);
+}
