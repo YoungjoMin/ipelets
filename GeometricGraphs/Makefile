@@ -2,7 +2,7 @@ CC = g++
 TESTFLAGS = -std=c++17 -Wall -g
 OBJFLAGS = -std=c++17 -Wall -O3 -c
 DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L../../bin -lipe
-OBJS = Delaunay.o GG.o RNG.o EMST.o GeometricGraphs.o
+OBJS = Delaunay.o GG.o RNG.o EMST.o GeometricGraphs.o Utils.o
 TARGET = GeometricGraphs.dll
 DLL = $(TARGET)
 LUA = $(TARGET:$.dll=$.lua)

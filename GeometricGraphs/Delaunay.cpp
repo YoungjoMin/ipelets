@@ -7,8 +7,6 @@
 # include <queue>
 # include <numeric>
 
-
-
 using namespace ipe;
 
 //all points want to add at Delaunay triangulation
@@ -17,55 +15,15 @@ static std::vector<Vector> pts;
 static std::mt19937 gen((unsigned int)time(NULL));
 
 
-//neccesary utils
-bool inCircle(const Vector& a, const Vector& b, const Vector& c, const Vector& d) {
-    double t[3][3] = {
-        {a.x-d.x, a.y-d.y, a.sqLen()-d.sqLen()},
-        {b.x-d.x, b.y-d.y, b.sqLen()-d.sqLen()},
-        {c.x-d.x, c.y-d.y, c.sqLen()-d.sqLen()},
-    };
-    double det = 0.0;
-    det += t[0][0]*(t[1][1]*t[2][2]-t[1][2]*t[2][1]);
-    det += t[0][1]*(t[1][2]*t[2][0]-t[1][0]*t[2][2]);
-    det += t[0][2]*(t[1][0]*t[2][1]-t[1][1]*t[2][0]);
-    return det>0;
-}
-
+//connect with Utils.cpp
 bool inCircle(int a, int b, int c, int pt) {
     return inCircle(pts[a],pts[b],pts[c],pts[pt]);
 }
-
-double cross(const Vector& v1, const Vector& v2) {
-    return v1.x*v2.y-v1.y*v2.x;
-}
-
-bool ccw(const Vector& p1, const Vector& p2, const Vector& p3) {
-    Vector t1 = p2-p1, t2 = p3-p1;
-    return cross(t1,t2)>=0;
-}
-
 bool ccw(int a, int b, int c) {
     return ccw(pts[a],pts[b],pts[c]);
 }
-
-bool sccw(const Vector& p1, const Vector& p2, const Vector& p3) {
-    Vector t1 = p2-p1, t2 = p3-p1;
-    return cross(t1,t2)>0;
-}
-
 bool sccw(int a, int b, int c) {
     return sccw(pts[a],pts[b],pts[c]);
-}
-
-//intersection of two line segments a->b,  c->d
-Vector intersection(const Vector& a, const Vector& b, const Vector& c, const Vector& d) {
-    Vector A = b-a, B = b-d, C = c-d;
-    double t1 = cross(B,C)/cross(A,C);
-    return b - A*t1;
-}
-
-Vector intersection(int a, int b, int c, int d) {
-    return intersection(pts[a],pts[b],pts[c],pts[d]);
 }
 
 /////////////////////////////////////////////////

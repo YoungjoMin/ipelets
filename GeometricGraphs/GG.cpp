@@ -7,7 +7,6 @@ void makeGG(const vector<Vector>& pts, const vector<pair<int, int>>& edges, vect
     for(const auto& [a,b]: edges) {
         Vector mid = (pts[a]+pts[b])*0.5;
         double limit = (pts[a]-mid).sqLen();
-
         
         bool emptyDisc = true;
         for(int i= 0;i<(int)pts.size();i++) {
@@ -15,7 +14,7 @@ void makeGG(const vector<Vector>& pts, const vector<pair<int, int>>& edges, vect
             const Vector& pt = pts[i];
 
             double cur = (mid-pt).sqLen();
-            if(cur>=limit) continue;
+            if(epsGE(cur,limit)) continue;
             emptyDisc = false;
             break;
         }

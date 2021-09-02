@@ -1,4 +1,4 @@
-DIRS :=  $(wildcard */)
+DIRS :=  GeometricGraphs PolygonTriangulation
 
 BUILDDIRS = $(DIRS:%=build-%)
 INSTALLDIRS = $(DIRS:%=install-%)

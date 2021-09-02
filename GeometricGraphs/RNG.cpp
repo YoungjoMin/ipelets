@@ -14,7 +14,7 @@ void makeRNG(const vector<Vector>& pts, const vector<pair<int, int>>& edges, vec
             const Vector& pt = pts[i];
 
             double cur = std::max((pts[a]-pt).sqLen(),(pts[b]-pt).sqLen());
-            if(cur>=limit) continue;
+            if(epsGE(cur,limit)) continue;
             emptyLune = false;
             break;
         }
