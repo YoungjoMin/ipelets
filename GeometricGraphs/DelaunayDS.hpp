@@ -2,8 +2,7 @@
 #define __DELAUNAY_DS_HPP__
 
 #include "../../include/ipelib.h"
-
-using namespace ipe;
+#include <vector>
 
 struct Triangle;
 struct Node;
@@ -32,8 +31,6 @@ struct Node {
         BySinglePt
     } divideBy;
 
-    int visitCnt;//for gathering all nodes
-
     Node(int p1, int p2, int p3);
     bool isLeaf() const;
     Node * findChild(int idx) const;//assert this node have child 
@@ -48,20 +45,18 @@ struct Node {
 
 struct PointLocation {
     Node * root;
-    PointLocation(const Vector& bl, const Vector& tr); //Point location structure that all points are bounded by bl, tr
+    PointLocation(const ipe::Vector& bl, const ipe::Vector& tr); //Point location structure that all points are bounded by bl, tr
     void insert(int idx);//insert idx's point
     void gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
     ~PointLocation();
 private:
-    mutable int gatherCnt;
     Node * NILNODE;
     Triangle * NILT;
+    std::vector<Node *> valid_node;
     void legalize(Node * node, int idx);
     void flip(Node * node, Node * onode, int a, int b);
     void insertPointInterior(Node* node, int idx);
     void insertPointEdge(Node* node, int idx, int edge);
-
-    void gatherAllNodes(std::vector<Node *>& nodes) const;
 };
 
 

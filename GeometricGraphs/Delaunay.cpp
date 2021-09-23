@@ -39,7 +39,6 @@ void Triangle::updateAdj(Triangle * prv, Triangle* cur) {
 Node::Node(int p1, int p2, int p3): p1(p1), p2(p2), p3(p3) {
     c1=c2=c3= NULL; t=NULL;
     divideBy = NotDivided;
-    visitCnt = 0;
 }
 
 bool Node::isLeaf() const {
@@ -58,20 +57,19 @@ PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
     pts.push_back( Vector(c - (b-d), d));
     pts.push_back( Vector(a + (b-d), d));
 
-    gatherCnt = 0;
-
     NILNODE = new Node(-1,-1,-1);
     NILT = new Triangle();
     NILT->node = NILNODE, NILNODE->t = NILT;
     NILT->adj[0]=NILT->adj[1]=NILT->adj[2]= NILT;
 
-
     Triangle* t = new Triangle();
     Node * node = new Node(n, n+1, n+2);
+    valid_node.push_back(node);
     t->node = node;
     t->adj[0]=t->adj[1]=t->adj[2] = NILT;
     node->t = t;
     root = node;
+    
 }
 
 //assert divieBy != NotDivided
@@ -174,6 +172,8 @@ void PointLocation::flip(Node * node, Node * onode, int aidx, int bidx) {
     Triangle * dt = new Triangle();
     Node * unode = new Node(aidx, bidx, cidx);
     Node * dnode = new Node(bidx, aidx, didx);
+    valid_node.push_back(unode);
+    valid_node.push_back(dnode);
 
     ut->node = unode;
     ut->adj[0]=dt, ut->adj[1]=t4, ut->adj[2]=t1;
@@ -207,29 +207,8 @@ void Node::pushValidEdges(std::vector<std::pair<int, int>>& edges, int limit) co
     if(p3<p1 && p3<limit && p1<limit) edges.push_back({p3,p1});
 }
 
-void PointLocation::gatherAllNodes(std::vector<Node *>& nodes) const {
-    gatherCnt++;
-    if(root->isLeaf()) return;
-
-    std::queue<Node *> q;
-    q.push(root);
-    while(!q.empty()) {
-        Node* cur = q.front();
-        q.pop();
-        for(Node * chd : {cur->c1, cur->c2, cur->c3}) {
-            if(chd == NULL) continue;
-            if(chd->visitCnt == gatherCnt) continue;
-            chd->visitCnt=gatherCnt;
-            q.push(chd);
-            nodes.push_back(chd);
-        }
-    }
-    return;
-}
 void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const {
-    std::vector<Node *> nodes;
-    gatherAllNodes(nodes);
-    for(const Node * node : nodes) {
+    for(const Node * node : valid_node) {
         if(!node->isLeaf()) continue;
         node->pushValidEdges(edges,limit);
     }
@@ -238,9 +217,7 @@ void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int 
 
 PointLocation::~PointLocation() 
 {
-    std::vector<Node *> nodes;
-    gatherAllNodes(nodes);
-    for(const Node * node : nodes) {
+    for(const Node * node : valid_node) {
         if(node->isLeaf())
             delete node->t;
         delete node;
@@ -261,6 +238,9 @@ void PointLocation::insertPointInterior(Node * node, int idx) {
     Node * node1 = new Node(idx, node->p1, node->p2);
     Node * node2 = new Node(idx, node->p2, node->p3);
     Node * node3 = new Node(idx, node->p3, node->p1);
+    valid_node.push_back(node1);
+    valid_node.push_back(node2);
+    valid_node.push_back(node3);
 
     nt1->node = node1;
     nt1->adj[0] = nt3, nt1->adj[1] = t1, nt1->adj[2] = nt2;
@@ -316,6 +296,10 @@ void PointLocation::insertPointEdge(Node* node, int idx, int edge) {
     Node * node2 = new Node(idx, bidx, cidx);
     Node * node3 = new Node(idx, cidx, didx);
     Node * node4 = new Node(idx, didx, aidx);    
+    valid_node.push_back(node1);
+    valid_node.push_back(node2);
+    valid_node.push_back(node3);
+    valid_node.push_back(node4);
 
     nt1->node = node1;
     nt1->adj[0] = nt4, nt1->adj[1] = t1, nt1->adj[2] = nt2;
@@ -393,3 +377,4 @@ bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, i
     pts.clear();
     return true;
 }
+
