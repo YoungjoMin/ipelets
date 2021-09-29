@@ -1,5 +1,5 @@
 # include "../../include/ipelib.h"
-# include "GeometricGraphs.hpp"
+# include "Voronoi.hpp"
 
 using namespace ipe;
 
@@ -51,7 +51,7 @@ bool addGivenEdges(IpeletData * data, std::vector<Vector>& pts, std::vector<std:
 }
 
 bool VoronoiIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
-    const static std::vector<GraphFunc> fn = {Delaunay, GG, RNG, EMST};
+    const static std::vector<GraphFunc> fn = {PointVoronoi};
     if(num<0 || num>=(int)fn.size()) return false;
 
     std::vector<Vector> pts;
