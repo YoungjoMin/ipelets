@@ -105,7 +105,7 @@ bool isClockwise(const vector<Vector>& pts, const Polygon& p) {
         min = cur;
         minIdx = i;
     }
-    return cross(pts[minIdx-1],pts[minIdx],pts[minIdx+1])<0;
+    return ccw(pts[minIdx-1],pts[minIdx],pts[minIdx+1])<0;
 }
 void reverseOrder(vector<Vector>& pts, Polygon& p) {
     Vector * arr = pts.data();

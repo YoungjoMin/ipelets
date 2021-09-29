@@ -48,9 +48,9 @@ private:
 	    }
 
         //check diagonal is totally inside or totally outside
-        bool c1 = cross(pts[i+1],pts[i],pts[i+2])<=0;
-        bool c2 = cross(pts[i+1],pts[i],pts[j+1])<=0;
-        bool c3 = cross(pts[i+1],pts[j+1],pts[i+2])<=0;
+        bool c1 = ccw(pts[i+1],pts[i],pts[i+2])<=0;
+        bool c2 = ccw(pts[i+1],pts[i],pts[j+1])<=0;
+        bool c3 = ccw(pts[i+1],pts[j+1],pts[i+2])<=0;
 
         if(c1&&c2&&c3) return true;
         if(!c1 && (c2||c3)) return true;
@@ -118,7 +118,7 @@ void MinAreaMaximize(const vector<Vector>& pts, const vector<Polygon>& polys, ve
     };
     auto compare = [](double d1, double d2) {return d1>d2;};
     auto calc = [] (const Vector& v1, const Vector& v2, const Vector& v3) {
-        return std::abs(cross(v1,v2,v3));
+        return std::abs(ccw(v1,v2,v3));
     };
     Solver solver(pts,-1,combine, compare, calc);
     solver.getEdges(edges);
@@ -128,7 +128,7 @@ void MaxAreaMinimize(const vector<Vector>& pts, const vector<Polygon>& polys, ve
     auto combine = [](double d1, double d2, double d3) { return std::max({d1,d2,d3});};
     auto compare = [](double d1, double d2) {return 0<d1 && d1<=d2;};
     auto calc = [] (const Vector& v1, const Vector& v2, const Vector& v3) {
-        return std::abs(cross(v1,v2,v3));
+        return std::abs(ccw(v1,v2,v3));
     };
     Solver solver(pts,-1,combine, compare, calc);
     solver.getEdges(edges);

@@ -7,7 +7,7 @@ using namespace std;
 double cross(const Vector& v1, const Vector& v2) {
     return v1.x*v2.y - v1.y*v2.x;
 }
-double cross(const Vector& v1, const Vector& v2, const Vector& v3) {
+double ccw(const Vector& v1, const Vector& v2, const Vector& v3) {
     return cross(v2-v1,v3-v1);
 }
 

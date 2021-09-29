@@ -4,7 +4,7 @@
 # include "../../include/ipelib.h"
 
 double cross(const ipe::Vector& v1, const ipe::Vector& v2);
-double cross(const ipe::Vector& v1, const ipe::Vector& v2, const ipe::Vector& v3);
+double ccw(const ipe::Vector& v1, const ipe::Vector& v2, const ipe::Vector& v3);
 
 //endpoint-endpoint intersection is not considered as intersection
 bool intersects(const ipe::Vector& l11, const ipe::Vector& l12, const ipe::Vector& l21, const ipe::Vector& l22);
