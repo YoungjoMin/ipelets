@@ -4,6 +4,7 @@
 *.dll
 *.o
 *.exe
+*.bak
 
 *.lua
 !/*/*.lua
