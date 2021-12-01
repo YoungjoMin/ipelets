@@ -5,9 +5,16 @@
 # include <vector>
 # include <utility>
 
-using Func = bool (*) (const std::vector<ipe::Vector>&, std::vector<std::pair<int, int>>&);
+using Edge = std::pair<int,int>;
+using Func = bool (*) (std::vector<ipe::Vector>&, std::vector<Edge>&);
 
-bool crust(const std::vector<ipe::Vector>& pts,
-    std::vector<std::pair<int, int>>& edges);
+bool Crust(std::vector<ipe::Vector>& pts,
+    std::vector<Edge>& edges);
+
+bool Delaunay(const std::vector<ipe::Vector>& npts,
+    std::vector<Edge>& edges);
+
+bool VoronoiVertices(const std::vector<ipe::Vector>& pts,
+    std::vector<ipe::Vector>& npts);
 
 #endif

@@ -56,7 +56,7 @@ bool addGivenEdges(IpeletData * data, std::vector<Vector>& pts, std::vector<std:
 }
 
 bool CurveReconstructionIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
-    const static std::vector<Func> fn = {crust};
+    const static std::vector<Func> fn = {Crust};
     if(num<0 || num>=(int)fn.size()) return false;
 
     std::vector<Vector> pts;

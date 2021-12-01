@@ -1,6 +1,7 @@
 # include "../../include/ipelib.h"
-# include "GeometricGraphs.hpp"
+# include "CurveReconstruction.hpp"
 # include "DelaunayDS.hpp"
+# include "Utils.hpp"
 # include <vector>
 # include <ctime>
 # include <random>
@@ -15,7 +16,6 @@ static std::vector<Vector> pts;
 static std::mt19937 gen((unsigned int)time(NULL));
 
 
-//connect with Utils.cpp
 bool inCircle(int a, int b, int c, int pt) {
     return inCircle(pts[a],pts[b],pts[c],pts[pt]);
 }
@@ -43,6 +43,20 @@ Node::Node(int p1, int p2, int p3): p1(p1), p2(p2), p3(p3) {
 
 bool Node::isLeaf() const {
     return divideBy==NotDivided;
+}
+
+Vector Node::getCircumCenter() const {
+    //TODO
+    Vector d1 = (pts[p1]-pts[p2]).orthogonal(), c1 = (pts[p1]+pts[p2])*0.5;
+    Vector d2 = (pts[p2]-pts[p3]).orthogonal();//, c2 = (pts[p2]+pts[p3])*0.5;
+    Vector c = (pts[p3]-pts[p1])*0.5;
+
+    //c1 + xd1 = c2 + yd2;
+    //(d1 -d2)  (x y)^T = c2-c1
+    double x_num = d2.x* c.y - d2.y*c.x;
+    double x_den = d1.x*d2.y - d1.y*d2.x;
+
+    return c1 + d1*(x_num/x_den);
 }
 
 PointLocation::PointLocation(const Vector& bl, const Vector& tr) {
@@ -215,6 +229,13 @@ void PointLocation::gatherAllEdges(std::vector<std::pair<int, int>>& edges, int 
     return;
 }
 
+void PointLocation::gatherAllVoronoiVertices(std::vector<ipe::Vector>& vpts, int limit) const {
+    for(const Node * node : valid_node) {
+      if(!node->isLeaf()) continue;
+      vpts.push_back(node->getCircumCenter());
+    }
+}
+
 PointLocation::~PointLocation() 
 {
     for(const Node * node : valid_node) {
@@ -361,6 +382,7 @@ void getBoundingBox(const std::vector<Vector>& pts, Vector& bl, Vector& tr) {
 
 bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, int>>& edges)
 {
+    pts.clear();
     pts.insert(pts.begin(), npts.begin(),npts.end());
     Vector bl, tr;
     getBoundingBox(npts, bl, tr);
@@ -374,6 +396,26 @@ bool Delaunay(const std::vector<ipe::Vector>& npts, std::vector<std::pair<int, i
         pointlocation.insert(cur);
     }
     pointlocation.gatherAllEdges(edges, npts.size());
+    pts.clear();
+    return true;
+}
+
+bool VoronoiVertices(const std::vector<ipe::Vector>& npts, std::vector<ipe::Vector>& vpts)
+{
+    pts.clear();  
+    pts.insert(pts.begin(), npts.begin(),npts.end());
+    Vector bl, tr;
+    getBoundingBox(npts, bl, tr);
+    PointLocation pointlocation (bl,tr);
+
+    std::vector<int> order(npts.size());
+    std::iota(order.begin(),order.end(),0);
+    std::shuffle(order.begin(), order.end(), gen);
+
+    for(int cur : order) {
+        pointlocation.insert(cur);
+    }
+    pointlocation.gatherAllVoronoiVertices(vpts, npts.size());
     pts.clear();
     return true;
 }

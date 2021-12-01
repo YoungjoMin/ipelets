@@ -41,6 +41,8 @@ struct Node {
     int getAdjNodeOppositeVertex(int edge) const;
     Node * getAdjNode(int edge) const;
     void pushValidEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
+    
+    ipe::Vector getCircumCenter() const;
 };
 
 struct PointLocation {
@@ -48,6 +50,7 @@ struct PointLocation {
     PointLocation(const ipe::Vector& bl, const ipe::Vector& tr); //Point location structure that all points are bounded by bl, tr
     void insert(int idx);//insert idx's point
     void gatherAllEdges(std::vector<std::pair<int, int>>& edges, int limit) const;
+    void gatherAllVoronoiVertices(std::vector<ipe::Vector>& vpts, int limit) const;
     ~PointLocation();
 private:
     Node * NILNODE;
