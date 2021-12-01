@@ -54,7 +54,7 @@ Vector Node::getCircumCenter() const {
     //c1 + xd1 = c2 + yd2;
     //(d1 -d2)  (x y)^T = c2-c1
     double x_num = d2.x* c.y - d2.y*c.x;
-    double x_den = d1.x*d2.y - d1.y*d2.x;
+    double x_den = d1.y*d2.x - d1.x*d2.y;
 
     return c1 + d1*(x_num/x_den);
 }

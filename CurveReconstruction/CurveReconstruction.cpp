@@ -55,14 +55,36 @@ bool addGivenEdges(IpeletData * data, std::vector<Vector>& pts, std::vector<std:
     return true;
 }
 
+bool addGivenVertices(IpeletData * data, IpeletHelper * helper, const std::vector<Vector>& vpts) {
+    Group * group = new Group();
+    for(auto v: vpts) {
+        Reference * cur = new Reference(data->iAttributes, Attribute(true, "Voronoi"), v);
+        group->push_back(cur);
+    }
+    Page * page = data->iPage;
+    page->append(ESecondarySelected, data->iLayer, group);
+    return true;
+}
+
 bool CurveReconstructionIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
     const static std::vector<Func> fn = {Crust};
     if(num<0 || num>=(int)fn.size()) return false;
 
     std::vector<Vector> pts;
-    std::vector<std::pair<int, int>> edges;
+    std::vector<Edge> edges;
     if(!getSelectedPoints(data,helper, pts)) return false;
     fn[num](pts,edges);
     addGivenEdges(data, pts,edges);
     return true;
 }
+
+/*  To print voronoi vertices
+bool CurveReconstructionIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
+
+    std::vector<Vector> pts, vpts;
+    if(!getSelectedPoints(data,helper, pts)) return false;
+    VoronoiVertices(pts,vpts);
+    addGivenVertices(data, helper, vpts);
+    return true;
+}
+*/
