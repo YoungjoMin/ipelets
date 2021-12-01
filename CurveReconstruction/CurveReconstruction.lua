@@ -12,4 +12,5 @@ end
 
 methods = {
     { label="crust" },
+    { label="beta skeleton" },
 }

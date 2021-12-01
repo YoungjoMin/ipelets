@@ -65,15 +65,23 @@ bool addGivenVertices(IpeletData * data, IpeletHelper * helper, const std::vecto
     page->append(ESecondarySelected, data->iLayer, group);
     return true;
 }
-
+bool getDoubleInput(IpeletHelper * helper, const char * prompt, double& inp) {
+  ipe::String s;
+  bool ret =  helper->getString(prompt,s);
+  inp = Platform::toDouble(s);
+  return ret && (epsGE(inp,1.0));
+}
 bool CurveReconstructionIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
-    const static std::vector<Func> fn = {Crust};
-    if(num<0 || num>=(int)fn.size()) return false;
-
+    
     std::vector<Vector> pts;
     std::vector<Edge> edges;
     if(!getSelectedPoints(data,helper, pts)) return false;
-    fn[num](pts,edges);
+    if(num==0) Crust(pts,edges);
+    else {
+      double beta;
+      getDoubleInput(helper, "give beta value (beta>=1)",beta);
+      BetaSkeleton(pts, edges, beta);
+    }
     addGivenEdges(data, pts,edges);
     return true;
 }

@@ -8,6 +8,9 @@
 using Edge = std::pair<int,int>;
 using Func = bool (*) (std::vector<ipe::Vector>&, std::vector<Edge>&);
 
+bool BetaSkeleton(const std::vector<ipe::Vector>& pts,
+     std::vector<Edge>& edges, double beta);
+
 bool Crust(std::vector<ipe::Vector>& pts,
     std::vector<Edge>& edges);
 
@@ -16,5 +19,6 @@ bool Delaunay(const std::vector<ipe::Vector>& npts,
 
 bool VoronoiVertices(const std::vector<ipe::Vector>& pts,
     std::vector<ipe::Vector>& npts);
+
 
 #endif
