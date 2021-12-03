@@ -1,4 +1,4 @@
-DIRS :=  GeometricGraphs PolygonTriangulation Voronoi
+DIRS :=  GeometricGraphs PolygonTriangulation Voronoi CurveReconstruction
 
 BUILDDIRS = $(DIRS:%=build-%)
 INSTALLDIRS = $(DIRS:%=install-%)
