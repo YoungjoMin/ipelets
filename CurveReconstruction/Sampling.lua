@@ -39,6 +39,12 @@ function randPos(lb,rt)
     return ipe.Vector(x,y)
 end
 
+function getSampleCnt(model)
+    local str = model:getString("Enter number of sampling points")
+    if not str or str:match("^%s*$)") then return end
+    return tonumber(str)
+end
+
 function SamplingInRectangle(model)
     local p = model:page()
     local prim = p:primarySelection()
@@ -54,9 +60,7 @@ function SamplingInRectangle(model)
     lb, rt = getRegion(obj, s)
     if not isAxisAlligned(obj, s, lb, rt) then wrongInput(model) return end
     
-    local str = model:getString("Enter number of sampling points")
-    if not str or str:match("^%s*$)") then return end
-    local k = tonumber(str)
+    local k = getSampleCnt(model)
     if not k then model:warning("Enter a number") return end
 
     local samplePts = {}
@@ -70,5 +74,5 @@ function SamplingInRectangle(model)
 end
 
 methods = {
-    { label="SamplingInRectangle", run = SamplingInRectangle },
+    { label="InRectangle", run = SamplingInRectangle },
 }
