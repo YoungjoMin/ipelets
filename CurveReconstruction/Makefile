@@ -5,7 +5,7 @@ DLLFLAGS = -std=c++17 -Wall -O3 -shared -lstdc++ -L../../bin -lipe
 OBJS = Delaunay.o Utils.o CurveReconstruction.o Crust.o BetaSkeleton.o
 TARGET = CurveReconstruction.dll
 DLL = $(TARGET)
-LUA = $(TARGET:$.dll=$.lua)
+LUA = CurveReconstruction.lua Sampling.lua
 
 ALL: $(TARGET)
 
