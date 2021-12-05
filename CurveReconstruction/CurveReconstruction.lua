@@ -13,4 +13,5 @@ end
 methods = {
     { label="crust" },
     { label="beta skeleton" },
+    { label="mark voronoi vertices" },
 }

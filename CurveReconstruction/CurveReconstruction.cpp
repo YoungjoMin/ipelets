@@ -58,7 +58,7 @@ bool addGivenEdges(IpeletData * data, std::vector<Vector>& pts, std::vector<std:
 bool addGivenVertices(IpeletData * data, IpeletHelper * helper, const std::vector<Vector>& vpts) {
     Group * group = new Group();
     for(auto v: vpts) {
-        Reference * cur = new Reference(data->iAttributes, Attribute(true, "Voronoi"), v);
+        Reference * cur = new Reference(data->iAttributes, Attribute(true, "mark/disk(sx)"), v);
         group->push_back(cur);
     }
     Page * page = data->iPage;
@@ -73,16 +73,21 @@ bool getDoubleInput(IpeletHelper * helper, const char * prompt, double& inp) {
 }
 bool CurveReconstructionIpelet::run(int num, IpeletData * data, IpeletHelper * helper) {
     
-    std::vector<Vector> pts;
+    std::vector<Vector> pts,vpts;
     std::vector<Edge> edges;
     if(!getSelectedPoints(data,helper, pts)) return false;
-    if(num==0) Crust(pts,edges);
-    else {
+    if(num==0) { Crust(pts,edges); addGivenEdges(data, pts,edges);}
+    else if(num==1) {
       double beta;
       getDoubleInput(helper, "give beta value (beta>=1)",beta);
       BetaSkeleton(pts, edges, beta);
+      addGivenEdges(data, pts,edges);
     }
-    addGivenEdges(data, pts,edges);
+    else {
+      VoronoiVertices(pts,vpts);
+      addGivenVertices(data, helper, vpts);
+    }
+    
     return true;
 }
 
